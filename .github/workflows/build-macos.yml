@@ -1,15 +1,11 @@
 name: Build VeraCrypt for macOS
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-14  # macOS Sequoia or Ventura (arm64/x86_64)
+    runs-on: macos-14
 
     steps:
     - name: Checkout source
@@ -18,14 +14,13 @@ jobs:
     - name: Install dependencies
       run: |
         brew update
-        brew install wxwidgets pkg-config nasm cmake
+        brew install pkg-config nasm cmake
 
-    - name: Set up environment variables
+    - name: Download wxWidgets 3.2.5
       run: |
-        echo "PATH=/opt/homebrew/opt/wxwidgets/bin:$PATH" >> $GITHUB_ENV
-        echo "PKG_CONFIG_PATH=/opt/homebrew/opt/wxwidgets/lib/pkgconfig" >> $GITHUB_ENV
-        echo "CPPFLAGS=-I/opt/homebrew/opt/wxwidgets/include" >> $GITHUB_ENV
-        echo "LDFLAGS=-L/opt/homebrew/opt/wxwidgets/lib" >> $GITHUB_ENV
+        cd /tmp
+        curl -L -O https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.5/wxWidgets-3.2.5.tar.bz2
+        tar xjf wxWidgets-3.2.5.tar.bz2
 
     - name: Build VeraCrypt
       run: |
