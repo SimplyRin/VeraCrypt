@@ -1,0 +1,46 @@
+name: Build VeraCrypt for macOS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14  # macOS Sequoia or Ventura (arm64/x86_64)
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        brew update
+        brew install wxwidgets pkg-config nasm cmake
+
+    - name: Set up environment variables
+      run: |
+        echo "PATH=/opt/homebrew/opt/wxwidgets/bin:$PATH" >> $GITHUB_ENV
+        echo "PKG_CONFIG_PATH=/opt/homebrew/opt/wxwidgets/lib/pkgconfig" >> $GITHUB_ENV
+        echo "CPPFLAGS=-I/opt/homebrew/opt/wxwidgets/include" >> $GITHUB_ENV
+        echo "LDFLAGS=-L/opt/homebrew/opt/wxwidgets/lib" >> $GITHUB_ENV
+
+    - name: Build VeraCrypt
+      run: |
+        cd src
+        chmod +x Build/build_veracrypt_macosx.sh
+        ./Build/build_veracrypt_macosx.sh
+
+    - name: Archive VeraCrypt.app
+      if: success()
+      run: |
+        mkdir -p output
+        cp -R src/Main/VeraCrypt.app output/
+
+    - name: Upload VeraCrypt.app artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: VeraCrypt-macOS-App
+        path: output/VeraCrypt.app
