@@ -1,4 +1,4 @@
-name: Build VeraCrypt for macOS
+name: Build VeraCrypt for macOS arm64
 
 on:
   workflow_dispatch:
@@ -22,11 +22,11 @@ jobs:
         curl -L -O https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.5/wxWidgets-3.2.5.tar.bz2
         tar xjf wxWidgets-3.2.5.tar.bz2
 
-    - name: Build VeraCrypt
+    - name: Build VeraCrypt (arm64)
       run: |
         cd src
         chmod +x Build/build_veracrypt_macosx.sh
-        ./Build/build_veracrypt_macosx.sh
+        arch -arm64 ./Build/build_veracrypt_macosx.sh
 
     - name: Archive VeraCrypt.app
       if: success()
@@ -37,5 +37,5 @@ jobs:
     - name: Upload VeraCrypt.app artifact
       uses: actions/upload-artifact@v4
       with:
-        name: VeraCrypt-macOS-App
+        name: VeraCrypt-macOS-arm64-App
         path: output/VeraCrypt.app
